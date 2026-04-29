@@ -8,12 +8,11 @@ int main()
 
     int total_frames, total_pages;
 
-    // 🔹 User input
     printf("Enter number of frames: ");
     scanf("%d", &total_frames);
 
     int frames[total_frames];
-
+    int time[total_frames]; 
     printf("Enter number of pages: ");
     scanf("%d", &total_pages);
 
@@ -29,18 +28,17 @@ int main()
     for(m = 0; m < total_frames; m++)
     {
         frames[m] = -1;
+        time[m] = 0;
     }
 
-    int index = 0; // ⭐ FIFO pointer
+    int counter = 0;  
 
-    // 🔹 Print reference string
     printf("\nReference string : ");
     for (int i = 0; i < total_pages; i++) {
         printf("%d ", pages[i]);
     }
     printf("\n");
 
-    // 🔹 Table Header
     printf("-------------------------------------------------------------\n");
     printf("Step\tPage\t");
 
@@ -53,27 +51,40 @@ int main()
     for(n = 0; n < total_pages; n++)
     {
         int found = 0;
+        counter++;
 
-        // 🔹 Check HIT
+        
         for(m = 0; m < total_frames; m++)
         {
             if(frames[m] == pages[n])
             {
                 found = 1;
                 page_hit++;
+                time[m] = counter;  
                 break;
             }
         }
 
-        // 🔹 FAULT (FIFO logic)
+        
         if(found == 0)
         {
-            frames[index] = pages[n];   // replace oldest
-            index = (index + 1) % total_frames;  // move circularly
+            int lru_index = 0;
+
+            // find least recently used
+            for(m = 1; m < total_frames; m++)
+            {
+                if(time[m] < time[lru_index])
+                {
+                    lru_index = m;
+                }
+            }
+
+            frames[lru_index] = pages[n];
+            time[lru_index] = counter;
             page_fault++;
         }
 
-        // 🔹 Print row
+        
         printf("%d\t%d\t", n+1, pages[n]);
 
         for(m = 0; m < total_frames; m++)
