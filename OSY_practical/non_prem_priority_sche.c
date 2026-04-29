@@ -8,6 +8,7 @@ struct priority_scheduling {
     int priority;
     int waiting_time;
     int turn_around_time;
+    int completed;
 };
 
 int main() {
@@ -18,7 +19,7 @@ int main() {
     printf("Enter total number of processes: ");
     scanf("%d", &n);
 
-    struct priority_scheduling p[n], temp;
+    struct priority_scheduling p[n];
 
     // Input
     for (int i = 0; i < n; i++) {
@@ -34,38 +35,45 @@ int main() {
 
         printf("Priority: ");
         scanf("%d", &p[i].priority);
+
+        p[i].completed = 0;
     }
 
-    // Sorting (by Arrival Time, then Priority)
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (p[i].arrival_time > p[j].arrival_time ||
-               (p[i].arrival_time == p[j].arrival_time &&
-                p[i].priority > p[j].priority)) {
+    int current_time = 0, completed = 0;
 
-                temp = p[i];
-                p[i] = p[j];
-                p[j] = temp;
+    while (completed < n) {
+        int idx = -1;
+        int highest_priority = 999999;
+
+        // 🔥 Dynamic selection (main fix)
+        for (int i = 0; i < n; i++) {
+            if (p[i].arrival_time <= current_time && p[i].completed == 0) {
+                if (p[i].priority < highest_priority) {
+                    highest_priority = p[i].priority;
+                    idx = i;
+                }
             }
         }
-    }
 
-    // Waiting Time & Turnaround Time Calculation
-    int current_time = 0;
+        if (idx == -1) {
+            current_time++; // CPU idle
+        } else {
+            p[idx].waiting_time = current_time - p[idx].arrival_time;
 
-    for (int i = 0; i < n; i++) {
-        if (current_time < p[i].arrival_time) {
-            current_time = p[i].arrival_time;
+            current_time += p[idx].burst_time;
+
+            p[idx].turn_around_time =
+                p[idx].waiting_time + p[idx].burst_time;
+
+            p[idx].completed = 1;
+            completed++;
+
+            total_wt += p[idx].waiting_time;
+            total_tat += p[idx].turn_around_time;
         }
-
-        p[i].waiting_time = current_time - p[i].arrival_time;
-
-        current_time += p[i].burst_time;
-
-        p[i].turn_around_time = p[i].waiting_time + p[i].burst_time;
     }
 
-    // Output
+    // Output (same as yours)
     printf("\nProcess\tAT\tBT\tPriority\tWT\tTAT\n");
     printf("-------------------------------------------------------\n");
 
@@ -79,18 +87,7 @@ int main() {
                p[i].turn_around_time);
     }
 
-    // Average Waiting Time
-    for (int i = 0; i < n; i++) {
-        total_wt += p[i].waiting_time;
-    }
-
     avg_wt = (float) total_wt / n;
-
-    // Average Turnaround Time
-    for (int i = 0; i < n; i++) {
-        total_tat += p[i].turn_around_time;
-    }
-
     avg_tat = (float) total_tat / n;
 
     printf("\nAverage Waiting Time = %.2f", avg_wt);
