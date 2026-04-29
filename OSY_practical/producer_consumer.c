@@ -50,17 +50,22 @@ int deleteData()
         itemcount--;
         return data;
     }
+    return -1;   // 🔥 fix (safe return)
 }
 
 void producer()
 {
     --mutex;
     --empty;
-    insertData(itemcount);
-    printf("Producer produces: %d\n", itemcount);
+
+    insert_item(buffer + 1);   // 🔥 fixed function + value
+
+    printf("Producer produces: %d\n", buffer + 1);
+
     ++full;
     ++buffer;
     ++mutex;
+
     printf("Count: %d\n", itemcount);
     printf("Buffer: %d\n", buffer);
     printf("Empty: %d\n", empty);
@@ -70,11 +75,15 @@ void consumer()
 {
     --mutex;
     --full;
+
     int x = deleteData();
-    printf("Consumer consumes: %d\n", x + 1);
+
+    printf("Consumer consumes: %d\n", x);   // 🔥 removed +1
+
     ++empty;
     --buffer;
     ++mutex;
+
     printf("Count: %d\n", itemcount);
     printf("Buffer Count: %d\n", buffer);
     printf("Empty Count: %d\n", empty);
@@ -91,20 +100,23 @@ int main()
     {
         printf("\nEnter your choice: ");
         scanf("%d", &n);
+
         switch (n)
         {
         case 1:
             if ((mutex == 1) && (empty != 0))
                 producer();
-            else if (buffer == MAX)
-                printf("Buffer is full!");
+            else
+                printf("Buffer is full!\n");
             break;
+
         case 2:
             if ((mutex == 1) && (full != 0))
                 consumer();
-            else if (buffer == 0)
-                printf("Buffer is empty!");
+            else
+                printf("Buffer is empty!\n");
             break;
+
         case 3:
             exit(0);
         }
