@@ -1,30 +1,62 @@
+#include <stdio.h>
 
-#include<stdio.h>
-void main()
+int main()
 {
-    int a,n,i;
-    printf("Enter memory size\n");
-    scanf("%d",&a);
-    printf("Enter no. of processes\n");
-    scanf("%d",&n);
-    int size[n];
-    for(i=0;i<n;i++)
+    int blockSize[20], processSize[20];
+    int m, n;
+    int allocation[20];
+
+    printf("Enter number of memory blocks: ");
+    scanf("%d", &m);
+
+    printf("Enter size of each block:\n");
+    for(int i = 0; i < m; i++)
     {
-        printf("Enter size of process %d:  ",i+1);
-        scanf("%d",&size[i]);
+        printf("Block %d: ", i + 1);
+        scanf("%d", &blockSize[i]);
     }
-     printf("\n");
-    for(i=0;i<n;i++)
+
+    printf("\nEnter number of processes: ");
+    scanf("%d", &n);
+
+    printf("Enter size of each process:\n");
+    for(int i = 0; i < n; i++)
     {
-        if(size[i]<=a)
+        printf("Process %d: ", i + 1);
+        scanf("%d", &processSize[i]);
+    }
+
+    // Initialize allocation as -1 (not allocated)
+    for(int i = 0; i < n; i++)
+    {
+        allocation[i] = -1;
+    }
+
+    // First Fit Algorithm
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
         {
-            printf("Process %d occupied: %d\n",i+1,size[i]);
-            a=a-size[i];
-            printf("Bytes remaining: %d \n\n",a);
+            if(blockSize[j] >= processSize[i])
+            {
+                allocation[i] = j;
+                blockSize[j] -= processSize[i];
+                break;
+            }
         }
+    }
+
+    // Output
+    printf("\nProcess No.\tProcess Size\tBlock No.\n");
+    for(int i = 0; i < n; i++)
+    {
+        printf("%d\t\t%d\t\t", i + 1, processSize[i]);
+
+        if(allocation[i] != -1)
+            printf("%d\n", allocation[i] + 1);
         else
-        {
-            printf("Insufficient memory\n\n");
-        }
+            printf("Not Allocated\n");
     }
+
+    return 0;
 }
