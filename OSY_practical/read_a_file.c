@@ -1,39 +1,31 @@
-// Read a file
-// C program to create a file
-
 #include <stdio.h>
 #include <stdlib.h>
 
 int main()
 {
-    // File pointer
     FILE *fptr;
+    char c;
 
-    // Creating file using fopen() access mode "w"
-    fptr = fopen("E:\\file1.txt", "w");
+    // Open file in read mode
+    fptr = fopen("E:\\file1.txt", "r");
 
-    // Checking if the file is created
+    // Check if file exists
     if (fptr == NULL)
     {
-        printf("The file is not opened. The program will exit now");
+        printf("Error! File cannot be opened.\n");
         exit(0);
     }
-    else
+
+    printf("File opened successfully.\n\n");
+
+    // Read file character by character
+    while ((c = fgetc(fptr)) != EOF)
     {
-        printf("The file is created successfully.");
+        printf("%c", c);
     }
 
-    char myString[100];   // array of chars (string)
-
-    // Read the content and store it inside the string
-    char c = fgetc(fptr);
-    printf("%c", c);
-
-    // fgets(myString, 100, fptr);
-
-    // Print the file content
-    // printf("%s", myString);
-
+    // Close file
     fclose(fptr);
+
     return 0;
 }
